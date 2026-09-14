@@ -1,0 +1,36 @@
+{
+  "name": "expectbox-agents",
+  "version": "0.1.0",
+  "description": "Scoped email inboxes for agents: Expectbox TypeScript and JavaScript SDK",
+  "type": "module",
+  "main": "./js/expectbox.mjs",
+  "types": "./js/expectbox.d.mts",
+  "exports": {
+    ".": {
+      "types": "./js/expectbox.d.mts",
+      "import": "./js/expectbox.mjs",
+      "default": "./js/expectbox.mjs"
+    }
+  },
+  "files": [
+    "js/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simon86pl/expectbox-sdk.git"
+  },
+  "homepage": "https://www.expectbox.com/agents/",
+  "bugs": "https://github.com/simon86pl/expectbox-sdk/issues",
+  "publishConfig": {
+    "access": "public"
+  }
+}

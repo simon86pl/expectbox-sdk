@@ -1,0 +1,87 @@
+name: SDK checks and releases
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.2"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: npm test
+      - run: python -m pip install build twine
+      - run: python -m build
+      - run: python -m twine check dist/*
+      - run: python -m pip install dist/*.whl
+      - run: python -m unittest discover -s tests -p '*_test.py'
+      - run: npm pack --pack-destination dist
+      - name: Test installed npm tarball
+        run: |
+          mkdir -p /tmp/expectbox-sdk-test
+          cp tests/*.test.mjs /tmp/expectbox-sdk-test/
+          npm install --prefix /tmp/expectbox-sdk-test "$PWD/dist/expectbox-agents-$(node -p "require('./package.json').version").tgz" --ignore-scripts
+          node --test /tmp/expectbox-sdk-test/*.test.mjs
+      - name: Verify matching versions
+        run: |
+          python -c "import json,re; p=json.load(open('package.json'))['version']; assert ('version = \"'+p+'\"') in open('pyproject.toml').read()"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then test "${GITHUB_REF_NAME}" = "v$(node -p "require('./package.json').version")"; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: dist/*
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: dist
+      - run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "Expectbox SDK $GITHUB_REF_NAME" --notes 'JavaScript/TypeScript and Python SDKs. Install the tarball or wheel from this release. See README for credentials, service activation requirements and examples.'
+        env:
+          GH_TOKEN: ${{ github.token }}
+  npm:
+    needs: release
+    if: vars.NPM_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.2"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm install -g npm@11
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: dist
+      - run: npm publish dist/*.tgz --access public --provenance
+  pypi:
+    needs: release
+    if: vars.PYPI_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: artifacts
+      - run: mkdir dist && cp artifacts/*.whl artifacts/*.tar.gz dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
