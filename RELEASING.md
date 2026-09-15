@@ -11,7 +11,7 @@ The initial release is installable directly from GitHub. npm/PyPI jobs remain di
 ### npm
 
 1. Sign into the intended publishing account with `npm login` locally. Never put credentials in Git or a chat.
-2. Verify the package name `expectbox-agents` is available. Publish the reviewed first tarball using `npm publish ./expectbox-agents-0.1.0.tgz --access public` (2FA may be required).
+2. Verify the package name `expectbox-agents` is available. Publish the reviewed first tarball using `npm publish ./expectbox-agents-0.1.1.tgz --access public` (2FA may be required).
 3. In that package's npm settings, add a GitHub Actions trusted publisher: owner `simon86pl`, repository `expectbox-sdk`, workflow filename `release.yml`, environment `npm`. Allow direct publishing.
 4. Set GitHub repository variable `NPM_PUBLISH_ENABLED=true`. Subsequent tags publish using OIDC; there is no long-lived npm token in CI.
 

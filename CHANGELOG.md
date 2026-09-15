@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Publish the JavaScript/TypeScript SDK to npm as `expectbox-agents`.
+- Link the Expectbox homepage prominently from the README and package metadata.
+- Use absolute documentation links so they also work on the npm package page.
+
 ## 0.1.0
 
 - JavaScript/TypeScript and Python clients for scoped agent inboxes.

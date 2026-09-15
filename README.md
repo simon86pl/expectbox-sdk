@@ -1,6 +1,8 @@
 # Expectbox Agents SDK
 
-Official JavaScript/TypeScript and Python clients for Expectbox Agents.
+[Website](https://www.expectbox.com/) · [Expectbox Agents](https://www.expectbox.com/agents/) · [API documentation](https://www.expectbox.com/agent-sdk/README.md) · [Releases](https://github.com/simon86pl/expectbox-sdk/releases)
+
+Official JavaScript/TypeScript and Python clients for [Expectbox Agents](https://www.expectbox.com/agents/).
 This repository contains the clients, examples and API contract; the hosted mail service is separate.
 
 ## Install
@@ -8,16 +10,16 @@ This repository contains the clients, examples and API contract; the hosted mail
 Node.js 22+:
 
 ```sh
-npm install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.1.0/expectbox-agents-0.1.0.tgz
+npm install expectbox-agents
 ```
 
 Python 3.10+:
 
 ```sh
-python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.1.0/expectbox_agents-0.1.0-py3-none-any.whl
+python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.1.1/expectbox_agents-0.1.1-py3-none-any.whl
 ```
 
-These commands install versioned GitHub release artifacts. Registry publishing to npm and PyPI requires publisher setup; the names `expectbox-agents` are not yet available there. Do not install lookalike packages. See [RELEASING.md](RELEASING.md).
+JavaScript and TypeScript use the [npm package](https://www.npmjs.com/package/expectbox-agents). The Python command installs a versioned GitHub release artifact; PyPI publication is not enabled yet. See [release instructions](https://github.com/simon86pl/expectbox-sdk/blob/main/RELEASING.md).
 
 ## Before connecting
 
@@ -85,7 +87,7 @@ print(len(page['items']))
 - Keys expire and can be revoked. Project/inbox limits and paid access are checked by the server, not the SDK. Revoking a project key does not revoke inbox keys it issued; revoke those separately.
 - Never include API keys in client-side apps, source control, logs or prompts. These clients do not execute email content or send messages automatically.
 
-See [openapi.json](openapi.json) for the project management contract, TypeScript declarations for return types, and [examples](examples) for runnable entry points. The full inbox API is documented at [Expectbox](https://www.expectbox.com/agent-sdk/README.md).
+See [openapi.json](https://github.com/simon86pl/expectbox-sdk/blob/main/openapi.json) for the project management contract, TypeScript declarations for return types, and [examples](https://github.com/simon86pl/expectbox-sdk/tree/main/examples) for runnable entry points. The full inbox API is documented at [Expectbox](https://www.expectbox.com/agent-sdk/README.md).
 
 ## Contributing
 
