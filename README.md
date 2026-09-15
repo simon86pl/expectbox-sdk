@@ -1,9 +1,19 @@
 # Expectbox Agents SDK
 
-[Website](https://www.expectbox.com/) · [Expectbox Agents](https://www.expectbox.com/agents/) · [API documentation](https://www.expectbox.com/agent-sdk/README.md) · [Releases](https://github.com/simon86pl/expectbox-sdk/releases)
+[Website](https://www.expectbox.com/) · [Expectbox Agents](https://www.expectbox.com/agents/) · [Documentation](https://www.expectbox.com/docs/) · [MCP](https://www.expectbox.com/docs/mcp/) · [Releases](https://github.com/simon86pl/expectbox-sdk/releases)
 
 Official JavaScript/TypeScript and Python clients for [Expectbox Agents](https://www.expectbox.com/agents/).
 This repository contains the clients, examples and API contract; the hosted mail service is separate.
+
+## Documentation and integrations
+
+The [documentation website](https://www.expectbox.com/docs/) includes quickstart guides, JavaScript/TypeScript, Python, permissions, webhooks and HTTP API details in seven languages.
+
+- [Hosted MCP](https://www.expectbox.com/docs/mcp/): `https://www.expectbox.com/mcp`, using OAuth (PKCE, dynamic registration) or a scoped inbox API key. Select and approve one inbox; manage connections at https://www.expectbox.com/mcp/connect. Project keys are not accepted by MCP.
+- [Framework recipes](https://www.expectbox.com/docs/integrations/): LangChain, Google ADK and generic n8n/Make HTTP requests. See `examples/langchain.mjs`, `examples/google_adk.py` and `examples/remote-mcp.mjs`. Install each example's framework separately; it is not a dependency of the SDK.
+- [Webhooks](https://www.expectbox.com/docs/webhooks/): verify signatures, persist event IDs and handle retries.
+
+ChatGPT, Claude and coding clients can use custom MCP connections where their plan/workspace supports them. These guides do not imply a marketplace listing or a native n8n node. AI model usage is billed by your chosen provider separately from Expectbox Agents.
 
 ## Install
 
