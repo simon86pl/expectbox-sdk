@@ -4,16 +4,27 @@ The version in `package.json` and `pyproject.toml` must match. Update both, add 
 
 `release.yml` verifies the versions, tests installed package artifacts, builds the npm tarball, Python wheel and source distribution, and attaches them to a GitHub release. It never publishes the backend.
 
-## One-time registry setup
+## npm publication
 
-The initial release is installable directly from GitHub. npm/PyPI jobs remain disabled until the repository owner completes their registry setup.
+`expectbox-agents` is already published on npm. The package includes the SDK and the `expectbox-mcp` executable; no second npm package is required. The release workflow tests the MCP script from the installed tarball as well as from source.
+
+Until trusted publishing is configured, publish the exact tested tarball from the GitHub release with the owner's authenticated npm account:
+
+```sh
+gh release download v0.2.0 --pattern 'expectbox-agents-*.tgz' --dir dist
+npm publish dist/expectbox-agents-0.2.0.tgz --access public
+npm view expectbox-agents version bin
+npx -y expectbox-agents@0.2.0 --version
+```
+
+Browser authentication or 2FA may be required. Do not put credentials in Git or chat. Verify the new registry version and executable before deploying pages that advertise the command.
+
+## Optional automated registry setup
 
 ### npm
 
-1. Sign into the intended publishing account with `npm login` locally. Never put credentials in Git or a chat.
-2. Verify the package name `expectbox-agents` is available. Publish the reviewed first tarball using `npm publish ./expectbox-agents-0.1.1.tgz --access public` (2FA may be required).
-3. In that package's npm settings, add a GitHub Actions trusted publisher: owner `simon86pl`, repository `expectbox-sdk`, workflow filename `release.yml`, environment `npm`. Allow direct publishing.
-4. Set GitHub repository variable `NPM_PUBLISH_ENABLED=true`. Subsequent tags publish using OIDC; there is no long-lived npm token in CI.
+1. In the existing package's npm settings, add a GitHub Actions trusted publisher: owner `simon86pl`, repository `expectbox-sdk`, workflow filename `release.yml`, environment `npm`. Allow direct publishing.
+2. Set GitHub repository variable `NPM_PUBLISH_ENABLED=true` only after configuring the trusted publisher. Subsequent tags publish using OIDC; there is no long-lived npm token in CI.
 
 ### PyPI
 

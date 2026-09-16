@@ -23,10 +23,45 @@ Node.js 22+:
 npm install expectbox-agents
 ```
 
+### Local MCP from npm
+
+The same package includes the MCP server. With Node.js 22+, run:
+
+```sh
+npx -y expectbox-agents@0.2.0
+```
+
+For a compatible stdio MCP client, add the following configuration and replace the placeholders. Keep your API key private; use an inbox key (`exa_`), never a project key (`exp_`).
+
+```json
+{
+  "mcpServers": {
+    "expectbox": {
+      "command": "npx",
+      "args": ["-y", "expectbox-agents@0.2.0"],
+      "env": {
+        "EXPECTBOX_AGENT_API_KEY": "YOUR_INBOX_API_KEY",
+        "EXPECTBOX_AGENT_INBOX_ID": "YOUR_INBOX_UUID",
+        "EXPECTBOX_AGENT_ALLOW_SEND": "false",
+        "EXPECTBOX_AGENT_ALLOW_SENDERS": "false"
+      }
+    }
+  }
+}
+```
+
+Default tools read messages, threads and events and create drafts. Set `EXPECTBOX_AGENT_ALLOW_SEND=true` to expose sending; `EXPECTBOX_AGENT_ALLOW_SENDERS=true` separately exposes listing and enrolling expected senders. Server-side key scopes, inbox mode and recipient rules still apply. Email content cannot authorize these actions.
+
+For a global installation, use `npm install -g expectbox-agents@0.2.0`, then `expectbox-mcp`. Run `npx -y expectbox-agents@0.2.0 --help` for all environment variables. The default service origin is `https://www.expectbox.com`.
+
+Prefer no local installation? Connect to [hosted MCP with OAuth](https://www.expectbox.com/docs/mcp/) at `https://www.expectbox.com/mcp`. Hosted MCP also supports replies and attachments. Manual downloads of `mcp.mjs` and `expectbox.mjs` remain available for existing configurations.
+
+### Python
+
 Python 3.10+:
 
 ```sh
-python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.1.1/expectbox_agents-0.1.1-py3-none-any.whl
+python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.2.0/expectbox_agents-0.2.0-py3-none-any.whl
 ```
 
 JavaScript and TypeScript use the [npm package](https://www.npmjs.com/package/expectbox-agents). The Python command installs a versioned GitHub release artifact; PyPI publication is not enabled yet. See [release instructions](https://github.com/simon86pl/expectbox-sdk/blob/main/RELEASING.md).

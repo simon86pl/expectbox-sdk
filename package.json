@@ -1,10 +1,13 @@
 {
   "name": "expectbox-agents",
-  "version": "0.1.1",
-  "description": "Scoped email inboxes for agents: Expectbox TypeScript and JavaScript SDK",
+  "version": "0.2.0",
+  "description": "Scoped email inboxes for agents: Expectbox SDK and MCP server for JavaScript and TypeScript",
   "type": "module",
   "main": "./js/expectbox.mjs",
   "types": "./js/expectbox.d.mts",
+  "bin": {
+    "expectbox-mcp": "./js/mcp.mjs"
+  },
   "exports": {
     ".": {
       "types": "./js/expectbox.d.mts",

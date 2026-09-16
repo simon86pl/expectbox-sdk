@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Include the local MCP server in the npm package, with the `expectbox-mcp` executable.
+- Run MCP with `npx -y expectbox-agents@0.2.0`; no manual script downloads required.
+- Add CLI help, version output and secret-safe configuration errors. Sending and sender enrollment remain opt-in and subject to server permissions.
+- Document local npm and hosted OAuth connections. Python API behavior is unchanged.
+
 ## 0.1.1
 
 - Publish the JavaScript/TypeScript SDK to npm as `expectbox-agents`.
