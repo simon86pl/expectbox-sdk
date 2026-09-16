@@ -65,6 +65,79 @@ async function run(args = [], messages = [], overrides = {}) {
 }
 const responses = (result) => result.stdout.trim().split("\n").map(JSON.parse);
 
+test("MCP rejects invalid arguments locally and never emits an incomplete RPC response", async (t) => {
+  let requests = 0;
+  const server = createServer((_req, res) => {
+    requests++;
+    res.end("{}");
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => {
+    server.closeAllConnections();
+    server.close();
+  });
+  const invalid = [
+    ["list_messages", { limit: "10" }],
+    ["list_messages", { limit: 0 }],
+    ["list_messages", { limit: 1.5 }],
+    ["list_messages", { q: {} }],
+    ["list_messages", { before: "2026-09-16T12:00:00.123456Z" }],
+    ["list_messages", JSON.parse('{"__proto__":"unexpected"}')],
+    ["create_draft", { to: "approved@example.org", text: "Fixture" }],
+    ["create_draft", { to: [1], text: "Fixture" }],
+    [
+      "send_message",
+      { to: ["approved@example.org"], text: "Fixture", requestKey: "" },
+    ],
+    [
+      "allow_sender",
+      { matchType: "all", matchValue: "example.org", reason: "Fixture" },
+    ],
+    ["list_events", { cursor: "9223372036854775808" }],
+  ];
+  const result = await run(
+    [],
+    [
+      ...init,
+      ...invalid.map(([name, args], index) => ({
+        jsonrpc: "2.0",
+        id: index + 10,
+        method: "tools/call",
+        params: { name, arguments: args },
+      })),
+      {
+        jsonrpc: "2.0",
+        id: 100,
+        method: "tools/call",
+        params: { name: "list_messages", arguments: false },
+      },
+      { jsonrpc: "2.0", id: 101, method: "notifications/initialized" },
+      { jsonrpc: "2.0", id: 102, method: "ping" },
+    ],
+    {
+      EXPECTBOX_AGENT_ORIGIN: `http://127.0.0.1:${server.address().port}`,
+      EXPECTBOX_AGENT_ALLOW_SEND: "true",
+      EXPECTBOX_AGENT_ALLOW_SENDERS: "true",
+    },
+  );
+  assert.equal(result.code, 0, result.stderr);
+  const output = responses(result);
+  assert.equal(requests, 0, "Invalid inputs must never make an API call");
+  for (const [index] of invalid.entries()) {
+    const response = output.find((m) => m.id === index + 10);
+    assert.equal(response.result?.isError, true, JSON.stringify(response));
+    assert.match(response.result.content[0].text, /Invalid/);
+  }
+  assert.equal(output.find((m) => m.id === 100).error.code, -32602);
+  assert.equal(output.find((m) => m.id === 101).error.code, -32600);
+  assert.deepEqual(output.find((m) => m.id === 102).result, {});
+  assert.ok(
+    output.every(
+      (m) => Object.hasOwn(m, "result") !== Object.hasOwn(m, "error"),
+    ),
+  );
+});
+
 test("npm MCP executable provides help/version without credentials and safe configuration errors", async () => {
   assert.equal(manifest.bin["expectbox-mcp"], "./js/mcp.mjs");
   assert.ok(
@@ -90,6 +163,51 @@ test("npm MCP executable provides help/version without credentials and safe conf
     assert.match(result.stderr, /configuration is invalid/);
     assert.doesNotMatch(result.stderr, /private:secret|Error:|at file:/);
   }
+});
+
+test("MCP requires a valid handshake and accepts exact API pagination cursors", async (t) => {
+  const seen = [];
+  const server = createServer((req, res) => {
+    seen.push(req.url);
+    res.end('{"items":[],"next":null}');
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => {
+    server.closeAllConnections();
+    server.close();
+  });
+  const before = "2026-09-16T12:00:00.123456Z";
+  const result = await run(
+    [],
+    [
+      { jsonrpc: "2.0", id: 90, method: "initialize", params: {} },
+      { jsonrpc: "2.0", method: "notifications/initialized" },
+      { jsonrpc: "2.0", id: 91, method: "tools/list" },
+      ...init,
+      {
+        jsonrpc: "2.0",
+        id: 92,
+        method: "tools/call",
+        params: {
+          name: "list_messages",
+          arguments: { folder: "inbox", limit: 100, before, beforeId: inbox },
+        },
+      },
+    ],
+    { EXPECTBOX_AGENT_ORIGIN: `http://127.0.0.1:${server.address().port}` },
+  );
+  const output = responses(result);
+  assert.equal(output.find((m) => m.id === 90).error.code, -32602);
+  assert.equal(output.find((m) => m.id === 91).error.code, -32000);
+  assert.deepEqual(
+    JSON.parse(output.find((m) => m.id === 92).result.content[0].text),
+    { items: [], next: null },
+  );
+  assert.equal(seen.length, 1);
+  const query = new URL(seen[0], "http://localhost").searchParams;
+  assert.equal(query.get("before"), before);
+  assert.equal(query.get("beforeId"), inbox);
+  assert.equal(query.get("folder"), "inbox");
 });
 
 test("installed MCP negotiates stdio and keeps sending and enrollment opt-in", async () => {
@@ -167,7 +285,7 @@ test("installed MCP preserves inbox scope and send idempotency against a local A
   );
   assert.equal(result.code, 0, result.stderr);
   const messages = responses(result);
-  assert.equal(messages.at(-1).error.code, -32602);
+  assert.equal(messages.at(-1).result.isError, true);
   assert.ok(messages.slice(1, -1).every((m) => !m.error && !m.result.isError));
   assert.equal(received.length, 3);
   assert.equal(

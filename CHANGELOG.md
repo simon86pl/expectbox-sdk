@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Validate MCP argument types, ranges, enums and pagination cursors before calling the API; return actionable tool errors without exposing input values.
+- Reject malformed initialization and request-shaped notifications without emitting incomplete JSON-RPC responses.
+- Support folder filtering in local MCP and preserve full-precision message cursors.
+- Add regression tests for invalid calls and valid pagination through the packaged executable. JavaScript and Python client APIs are unchanged.
+
 ## 0.2.0
 
 - Include the local MCP server in the npm package, with the `expectbox-mcp` executable.

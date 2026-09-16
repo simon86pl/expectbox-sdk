@@ -28,7 +28,7 @@ npm install expectbox-agents
 The same package includes the MCP server. With Node.js 22+, run:
 
 ```sh
-npx -y expectbox-agents@0.2.0
+npx -y expectbox-agents@0.2.1
 ```
 
 For a compatible stdio MCP client, add the following configuration and replace the placeholders. Keep your API key private; use an inbox key (`exa_`), never a project key (`exp_`).
@@ -38,7 +38,7 @@ For a compatible stdio MCP client, add the following configuration and replace t
   "mcpServers": {
     "expectbox": {
       "command": "npx",
-      "args": ["-y", "expectbox-agents@0.2.0"],
+      "args": ["-y", "expectbox-agents@0.2.1"],
       "env": {
         "EXPECTBOX_AGENT_API_KEY": "YOUR_INBOX_API_KEY",
         "EXPECTBOX_AGENT_INBOX_ID": "YOUR_INBOX_UUID",
@@ -52,7 +52,7 @@ For a compatible stdio MCP client, add the following configuration and replace t
 
 Default tools read messages, threads and events and create drafts. Set `EXPECTBOX_AGENT_ALLOW_SEND=true` to expose sending; `EXPECTBOX_AGENT_ALLOW_SENDERS=true` separately exposes listing and enrolling expected senders. Server-side key scopes, inbox mode and recipient rules still apply. Email content cannot authorize these actions.
 
-For a global installation, use `npm install -g expectbox-agents@0.2.0`, then `expectbox-mcp`. Run `npx -y expectbox-agents@0.2.0 --help` for all environment variables. The default service origin is `https://www.expectbox.com`.
+For a global installation, use `npm install -g expectbox-agents@0.2.1`, then `expectbox-mcp`. Run `npx -y expectbox-agents@0.2.1 --help` for all environment variables. The default service origin is `https://www.expectbox.com`.
 
 Prefer no local installation? Connect to [hosted MCP with OAuth](https://www.expectbox.com/docs/mcp/) at `https://www.expectbox.com/mcp`. Hosted MCP also supports replies and attachments. Manual downloads of `mcp.mjs` and `expectbox.mjs` remain available for existing configurations.
 
@@ -61,7 +61,7 @@ Prefer no local installation? Connect to [hosted MCP with OAuth](https://www.exp
 Python 3.10+:
 
 ```sh
-python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.2.0/expectbox_agents-0.2.0-py3-none-any.whl
+python -m pip install https://github.com/simon86pl/expectbox-sdk/releases/download/v0.2.1/expectbox_agents-0.2.1-py3-none-any.whl
 ```
 
 JavaScript and TypeScript use the [npm package](https://www.npmjs.com/package/expectbox-agents). The Python command installs a versioned GitHub release artifact; PyPI publication is not enabled yet. See [release instructions](https://github.com/simon86pl/expectbox-sdk/blob/main/RELEASING.md).
@@ -124,7 +124,7 @@ print(len(page['items']))
 - Base URL: `https://www.expectbox.com/api/agents/v1`. Override `baseUrl` / `base_url` with an HTTPS origin for another deployment; HTTP is accepted only on localhost for tests.
 - Project: `project()`, `inboxes()`, `createInbox()`, `createInboxKey()`, `revokeInboxKey()`; Python uses snake_case.
 - Inbox: `inboxes()`, `messages()`, `message()`, `thread()`, `attachment()`, `draft()`, `editDraft()` / `edit_draft()`, `send()`, `reply()`, `events()`, `senders()`, `allowSender()` / `allow_sender()`.
-- Messages use `items` and `next`. Pass `next.before` and `next.beforeId` to get the next page. Events return `items`, `cursor` and `retentionDays`; persist the cursor after processing.
+- Messages use `items` and `next`. Pass `next.before` and `next.beforeId` unchanged to get the next page; do not convert the timestamp through JavaScript `Date`, which loses microseconds. Events return `items`, `cursor` and `retentionDays`; persist the cursor after processing.
 - Delivery is queued, not guaranteed by a successful send response. Sending needs `messages:send`, inbox mode `send`, an approved recipient and available quota. Unknown incoming senders are rejected before storage.
 - Inbox creation, sending and replies require your persisted idempotency key. Same key and content return the same result; changed content returns 409. Inbox keys are not idempotent: do not retry key creation blindly after a timeout; inspect/revoke unused keys in the panel.
 - No automatic retries. Retry GETs with backoff; retry idempotent writes using the original key. Errors expose `.status` in JavaScript and standard `urllib.error.HTTPError.code` in Python.

@@ -11,10 +11,10 @@ The version in `package.json` and `pyproject.toml` must match. Update both, add 
 Until trusted publishing is configured, publish the exact tested tarball from the GitHub release with the owner's authenticated npm account:
 
 ```sh
-gh release download v0.2.0 --pattern 'expectbox-agents-*.tgz' --dir dist
-npm publish dist/expectbox-agents-0.2.0.tgz --access public
+gh release download v0.2.1 --pattern 'expectbox-agents-*.tgz' --dir dist
+npm publish dist/expectbox-agents-0.2.1.tgz --access public
 npm view expectbox-agents version bin
-npx -y expectbox-agents@0.2.0 --version
+npx -y expectbox-agents@0.2.1 --version
 ```
 
 Browser authentication or 2FA may be required. Do not put credentials in Git or chat. Verify the new registry version and executable before deploying pages that advertise the command.
